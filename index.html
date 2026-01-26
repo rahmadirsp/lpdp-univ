@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Filter Program Studi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .tab-active { 
+            background-color: #2563eb; 
+            color: white; 
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+
+    <div class="max-w-7xl mx-auto px-4 py-12">
+        <!-- Header Section -->
+        <div class="mb-12 text-center">
+            <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight">Eksplorasi Program Studi</h1>
+            <p class="text-slate-600 mt-4 text-lg">Cari dan filter program magister berdasarkan industri strategis dan lokasi.</p>
+        </div>
+
+        <!-- Controls Card -->
+        <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 mb-8">
+            <div class="flex flex-col lg:flex-row gap-8 items-end">
+                
+                <!-- Category Selector -->
+                <div class="w-full lg:w-auto">
+                    <label class="block text-sm font-semibold text-slate-700 mb-3 text-center lg:text-left">Kategori Program</label>
+                    <div class="flex flex-wrap justify-center lg:justify-start gap-2 p-1 bg-slate-100 rounded-xl" id="categoryTabs">
+                        <button onclick="changeCategory('semua')" data-cat="semua" class="cat-btn px-5 py-2 rounded-lg text-sm font-medium transition-all tab-active">Semua</button>
+                        <button onclick="changeCategory('luar-negeri')" data-cat="luar-negeri" class="cat-btn px-5 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-white transition-all">Luar Negeri</button>
+                        <button onclick="changeCategory('dalam-negeri')" data-cat="dalam-negeri" class="cat-btn px-5 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-white transition-all">Dalam Negeri</button>
+                        <button onclick="changeCategory('unggulan')" data-cat="unggulan" class="cat-btn px-5 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-white transition-all">Unggulan</button>
+                    </div>
+                </div>
+
+                <!-- Search Bar -->
+                <div class="flex-1 w-full">
+                    <label class="block text-sm font-semibold text-slate-700 mb-3">Cari Spesifik</label>
+                    <div class="relative">
+                        <input type="text" id="searchBox" onkeyup="renderTable()" 
+                               placeholder="Cari universitas, program studi, atau negara..." 
+                               class="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all">
+                        <div class="absolute left-4 top-3.5 text-slate-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Messaging -->
+        <div id="loadingState" class="text-center py-20">
+            <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-blue-600 border-t-transparent"></div>
+            <p class="text-slate-500 mt-4 font-medium">Memuat data...</p>
+        </div>
+
+        <div id="errorState" class="hidden text-center py-20 bg-amber-50 rounded-2xl border border-amber-100">
+            <p class="text-amber-700 font-semibold text-lg">Peringatan Koneksi Data</p>
+            <p class="text-amber-600 mt-1">Menggunakan data cadangan karena file JSON tidak dapat diakses secara langsung.</p>
+            <button onclick="fetchData()" class="mt-4 px-4 py-2 bg-amber-600 text-white rounded-lg text-sm font-bold">Coba Lagi</button>
+        </div>
+
+        <!-- Table Display -->
+        <div id="mainContent" class="hidden animate-in fade-in duration-500">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-200">
+                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">No</th>
+                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Jenjang</th>
+                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Industri Strategis</th>
+                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Perguruan Tinggi</th>
+                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Program Studi</th>
+                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Negara</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody" class="divide-y divide-slate-100">
+                            <!-- Rows injected here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div id="emptyResult" class="hidden py-16 text-center">
+                    <div class="text-slate-300 mb-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 9.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <p class="text-slate-500 font-medium">Pencarian tidak ditemukan.</p>
+                </div>
+            </div>
+            
+            <!-- Result Meta -->
+            <div class="mt-6 flex justify-between items-center px-2">
+                <p class="text-sm text-slate-500">
+                    Ditemukan <span id="countBadge" class="font-bold text-slate-800">0</span> hasil.
+                </p>
+                <p class="text-xs text-slate-400 italic" id="dataSourceInfo">Data dimuat dari file JSON</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data cadangan jika fetch gagal
+        const fallbackData = [
+            { "cat": "luar-negeri", "jenjang": "Magister", "industri": "Digitalisasi", "univ": "Aalborg University", "prodi": "Computer Engineering", "negara": "Denmark" },
+            { "cat": "luar-negeri", "jenjang": "Magister", "industri": "Digitalisasi", "univ": "Aalborg University", "prodi": "Computer Science (IT)", "negara": "Denmark" },
+            { "cat": "luar-negeri", "jenjang": "Magister", "industri": "Digitalisasi", "univ": "Aalborg University", "prodi": "Cyber Security", "negara": "Denmark" },
+            { "cat": "dalam-negeri", "jenjang": "Master", "industri": "Digitalisasi", "univ": "Institut Pertanian Bogor", "prodi": "Ilmu Komputer", "negara": "Indonesia" },
+            { "cat": "dalam-negeri", "jenjang": "Master", "industri": "Digitalisasi", "univ": "Institut Pertanian Bogor", "prodi": "Matematika Terapan", "negara": "Indonesia" },
+            { "cat": "dalam-negeri", "jenjang": "Master", "industri": "Digitalisasi", "univ": "Institut Pertanian Bogor", "prodi": "Statistika Dan Sains Data", "negara": "Indonesia" },
+            { "cat": "dalam-negeri", "jenjang": "Master", "industri": "Digitalisasi", "univ": "Institut Pertanian Bogor", "prodi": "Statistika Terapan", "negara": "Indonesia" },
+            { "cat": "dalam-negeri", "jenjang": "Master", "industri": "Digitalisasi", "univ": "Institut Teknologi Bandung", "prodi": "Aktuaria", "negara": "Indonesia" },
+            { "cat": "dalam-negeri", "jenjang": "Master", "industri": "Digitalisasi", "univ": "Institut Teknologi Bandung", "prodi": "Informatika", "negara": "Indonesia" },
+            { "cat": "dalam-negeri", "jenjang": "Master", "industri": "Digitalisasi", "univ": "Institut Teknologi Bandung", "prodi": "Instrumentasi Dan Kontrol", "negara": "Indonesia" },
+            { "cat": "unggulan", "jenjang": "Magister", "industri": "Digitalisasi", "univ": "California Institute of Technology", "prodi": "Applied and Computational Mathematics, M.S", "negara": "Amerika Serikat" },
+            { "cat": "unggulan", "jenjang": "Magister", "industri": "Digitalisasi", "univ": "California Institute of Technology", "prodi": "Computer Science, M.S", "negara": "Amerika Serikat" },
+            { "cat": "unggulan", "jenjang": "Magister", "industri": "Digitalisasi", "univ": "California Institute of Technology", "prodi": "Computing and Mathematical Sciences, M.S", "negara": "Amerika Serikat" }
+        ];
+
+        let rawData = [];
+        let filterActive = 'semua';
+
+        async function fetchData() {
+            const loading = document.getElementById('loadingState');
+            const content = document.getElementById('mainContent');
+            const error = document.getElementById('errorState');
+            const sourceInfo = document.getElementById('dataSourceInfo');
+
+            // Reset UI states
+            loading.classList.remove('hidden');
+            content.classList.add('hidden');
+            error.classList.add('hidden');
+
+            try {
+                // Mencoba fetch file eksternal (bekerja di GitHub Pages)
+                const response = await fetch('./data.json');
+                if (!response.ok) throw new Error('Data file not found');
+                
+                rawData = await response.json();
+                sourceInfo.innerText = "Data dimuat dari file JSON";
+                console.log("Data loaded from JSON");
+            } catch (err) {
+                console.warn("Fetch failed, using fallback data:", err);
+                rawData = fallbackData;
+                sourceInfo.innerText = "Data dimuat dari memori lokal (cadangan)";
+                // Jangan tampilkan error merah besar, cukup gunakan data fallback
+            } finally {
+                loading.classList.add('hidden');
+                content.classList.remove('hidden');
+                renderTable();
+            }
+        }
+
+        function changeCategory(cat) {
+            filterActive = cat;
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                if (btn.getAttribute('data-cat') === cat) {
+                    btn.classList.add('tab-active');
+                    btn.classList.remove('text-slate-600');
+                } else {
+                    btn.classList.remove('tab-active');
+                    btn.classList.add('text-slate-600');
+                }
+            });
+            renderTable();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            const search = document.getElementById('searchBox').value.toLowerCase();
+            const empty = document.getElementById('emptyResult');
+            const badge = document.getElementById('countBadge');
+            
+            tbody.innerHTML = '';
+            
+            const filtered = rawData.filter(item => {
+                const matchesCat = filterActive === 'semua' || item.cat === filterActive;
+                const matchesSearch = 
+                    item.univ.toLowerCase().includes(search) ||
+                    item.prodi.toLowerCase().includes(search) ||
+                    item.industri.toLowerCase().includes(search) ||
+                    item.negara.toLowerCase().includes(search);
+                
+                return matchesCat && matchesSearch;
+            });
+
+            badge.innerText = filtered.length;
+
+            if (filtered.length === 0) {
+                empty.classList.remove('hidden');
+            } else {
+                empty.classList.add('hidden');
+                filtered.forEach((item, index) => {
+                    const row = `
+                        <tr class="hover:bg-slate-50 transition-colors group">
+                            <td class="px-6 py-4 text-sm font-medium text-slate-400">${index + 1}</td>
+                            <td class="px-6 py-4 text-sm text-slate-600">${item.jenjang}</td>
+                            <td class="px-6 py-4">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-700/10">
+                                    ${item.industri}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-sm font-bold text-slate-800">${item.univ}</td>
+                            <td class="px-6 py-4 text-sm text-slate-600 italic group-hover:text-blue-600 transition-colors">${item.prodi}</td>
+                            <td class="px-6 py-4">
+                                <div class="flex items-center text-sm text-slate-600 font-medium">
+                                    <svg class="h-4 w-4 mr-2 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+                                    </svg>
+                                    ${item.negara}
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.insertAdjacentHTML('beforeend', row);
+                });
+            }
+        }
+
+        window.addEventListener('load', fetchData);
+    </script>
+</body>
+</html>

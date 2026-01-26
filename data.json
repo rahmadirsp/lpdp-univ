@@ -1,0 +1,26 @@
+[
+  {
+    "cat": "luar-negeri",
+    "jenjang": "Magister",
+    "industri": "Digitalisasi",
+    "univ": "Aalborg University",
+    "prodi": "Computer Engineering",
+    "negara": "Denmark"
+  },
+  {
+    "cat": "dalam-negeri",
+    "jenjang": "Master",
+    "industri": "Digitalisasi",
+    "univ": "Institut Pertanian Bogor",
+    "prodi": "Ilmu Komputer",
+    "negara": "Indonesia"
+  },
+  {
+    "cat": "unggulan",
+    "jenjang": "Magister",
+    "industri": "Digitalisasi",
+    "univ": "California Institute of Technology",
+    "prodi": "Applied and Computational Mathematics, M.S",
+    "negara": "Amerika Serikat"
+  }
+]
