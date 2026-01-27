@@ -24,20 +24,20 @@
     <div class="max-w-7xl mx-auto px-4 py-12">
         <!-- Header Section -->
         <div class="mb-12 text-center">
-            <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight">Eksplorasi Program Studi</h1>
-            <p class="text-slate-600 mt-4 text-lg">Cari dan filter program magister berdasarkan industri strategis, lokasi, dan bidang beasiswa.</p>
+            <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight">Eksplorasi Prodi LPDP 2026 Batch 1</h1>
+            <p class="text-slate-600 mt-4 text-lg">Filter program magister berdasarkan kategori, bidang beasiswa, dan detail institusi.</p>
+            <p class="text-slate-400 mt-4 text-lg">Semangat Berjuang!!!</p>
         </div>
 
         <!-- Controls Card -->
         <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 mb-8">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 
-                <!-- Category Selector -->
+                <!-- Category Selector (Tanpa 'Semua') -->
                 <div class="lg:col-span-12">
-                    <label class="block text-sm font-semibold text-slate-700 mb-3">Kategori Program</label>
+                    <label class="block text-sm font-semibold text-slate-700 mb-3">Kategori Program (Pilih salah satu)</label>
                     <div class="flex flex-wrap gap-2 p-1 bg-slate-100 rounded-xl w-fit" id="categoryTabs">
-                        <button onclick="changeCategory('semua')" data-cat="semua" class="cat-btn px-5 py-2 rounded-lg text-sm font-medium transition-all tab-active">Semua</button>
-                        <button onclick="changeCategory('unggulan')" data-cat="unggulan" class="cat-btn px-5 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-white transition-all">Unggulan</button>
+                        <button onclick="changeCategory('unggulan')" data-cat="unggulan" class="cat-btn px-5 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-white transition-all tab-active">Unggulan</button>
                         <button onclick="changeCategory('luar-negeri')" data-cat="luar-negeri" class="cat-btn px-5 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-white transition-all">Luar Negeri</button>
                         <button onclick="changeCategory('dalam-negeri')" data-cat="dalam-negeri" class="cat-btn px-5 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-white transition-all">Dalam Negeri</button>
                         <button onclick="changeCategory('afirmasi')" data-cat="afirmasi" class="cat-btn px-5 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-white transition-all">Afirmasi</button>
@@ -67,18 +67,22 @@
                     </div>
                 </div>
 
-                <!-- Search Bar -->
-                <div class="lg:col-span-12">
-                    <label class="block text-sm font-semibold text-slate-700 mb-3">Cari Spesifik</label>
-                    <div class="relative">
-                        <input type="text" id="searchBox" onkeyup="renderTable()" 
-                               placeholder="Cari universitas, program studi, industri, atau negara..." 
-                               class="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all">
-                        <div class="absolute left-4 top-3.5 text-slate-400">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
-                        </div>
+                <!-- Multi-Search Inputs -->
+                <div class="lg:col-span-12 grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Perguruan Tinggi</label>
+                        <input type="text" id="searchUniv" onkeyup="renderTable()" placeholder="Cari universitas..." 
+                               class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Program Studi</label>
+                        <input type="text" id="searchProdi" onkeyup="renderTable()" placeholder="Cari prodi..." 
+                               class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Negara</label>
+                        <input type="text" id="searchNegara" onkeyup="renderTable()" placeholder="Cari negara..." 
+                               class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm transition-all">
                     </div>
                 </div>
             </div>
@@ -92,7 +96,7 @@
 
         <div id="errorState" class="hidden text-center py-20 bg-amber-50 rounded-2xl border border-amber-100">
             <p class="text-amber-700 font-semibold text-lg">Peringatan Koneksi Data</p>
-            <p class="text-amber-600 mt-1">Menggunakan data cadangan karena file JSON tidak dapat diakses secara langsung.</p>
+            <p class="text-amber-600 mt-1">Gagal mengambil data dari file JSON.</p>
             <button onclick="fetchData()" class="mt-4 px-4 py-2 bg-amber-600 text-white rounded-lg text-sm font-bold">Coba Lagi</button>
         </div>
 
@@ -111,7 +115,7 @@
                             </tr>
                         </thead>
                         <tbody id="tableBody" class="divide-y divide-slate-100">
-                            <!-- Rows injected here -->
+                            <!-- Baris data di sini -->
                         </tbody>
                     </table>
                 </div>
@@ -122,11 +126,10 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 9.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                     </div>
-                    <p class="text-slate-500 font-medium">Pencarian tidak ditemukan.</p>
+                    <p class="text-slate-500 font-medium">Data tidak ditemukan dengan kriteria tersebut.</p>
                 </div>
             </div>
             
-            <!-- Result Meta -->
             <div class="mt-6 flex justify-between items-center px-2">
                 <p class="text-sm text-slate-500">
                     Ditemukan <span id="countBadge" class="font-bold text-slate-800">0</span> hasil.
@@ -137,7 +140,6 @@
     </div>
 
     <script>
-        // Data cadangan menggunakan format baru
         const fallbackData = [
             { "cat": "dalam-negeri", "jenjang": "Master", "industri": "Digitalisasi", "univ": "Institut Pertanian Bogor", "prodi": "Ilmu Komputer", "negara": "Indonesia", "bidang": "strategis-stem" },
             { "cat": "luar-negeri", "jenjang": "Magister", "industri": "Digitalisasi", "univ": "Aalborg University", "prodi": "Cyber Security", "negara": "Denmark", "bidang": "share" },
@@ -146,7 +148,7 @@
         ];
 
         let rawData = [];
-        let filterCategory = 'semua';
+        let filterCategory = 'unggulan'; // Default ke unggulan karena 'semua' dihapus
 
         async function fetchData() {
             const loading = document.getElementById('loadingState');
@@ -184,7 +186,6 @@
             renderTable();
         }
 
-        // Helper untuk format nama bidang yang lebih rapi
         function formatBidang(bidang) {
             const mapping = {
                 'share': 'SHARE',
@@ -197,9 +198,13 @@
 
         function renderTable() {
             const tbody = document.getElementById('tableBody');
-            const search = document.getElementById('searchBox').value.toLowerCase();
             const empty = document.getElementById('emptyResult');
             const badge = document.getElementById('countBadge');
+            
+            // Ambil nilai dari masing-masing input pencarian
+            const univSearch = document.getElementById('searchUniv').value.toLowerCase();
+            const prodiSearch = document.getElementById('searchProdi').value.toLowerCase();
+            const negaraSearch = document.getElementById('searchNegara').value.toLowerCase();
             
             // Ambil bidang yang dicentang
             const selectedBidang = Array.from(document.querySelectorAll('.checkbox-custom:checked')).map(cb => cb.value);
@@ -207,15 +212,15 @@
             tbody.innerHTML = '';
             
             const filtered = rawData.filter(item => {
-                const matchesCat = filterCategory === 'semua' || item.cat === filterCategory;
+                const matchesCat = item.cat === filterCategory;
                 const matchesBidang = selectedBidang.length === 0 || selectedBidang.includes(item.bidang);
-                const matchesSearch = 
-                    item.univ.toLowerCase().includes(search) ||
-                    item.prodi.toLowerCase().includes(search) ||
-                    item.industri.toLowerCase().includes(search) ||
-                    item.negara.toLowerCase().includes(search);
                 
-                return matchesCat && matchesBidang && matchesSearch;
+                // Pencarian spesifik kolom
+                const matchesUniv = item.univ.toLowerCase().includes(univSearch);
+                const matchesProdi = item.prodi.toLowerCase().includes(prodiSearch);
+                const matchesNegara = item.negara.toLowerCase().includes(negaraSearch);
+                
+                return matchesCat && matchesBidang && matchesUniv && matchesProdi && matchesNegara;
             });
 
             badge.innerText = filtered.length;
