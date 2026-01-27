@@ -139,7 +139,7 @@
         let filteredData = [];
         let filterCategory = 'unggulan';
         let currentPage = 1;
-        const rowsPerPage = 50; // Menampilkan 50 data per halaman agar tetap cepat
+        const rowsPerPage = 50; 
         let debounceTimer;
 
         async function fetchData() {
@@ -148,7 +148,6 @@
                 if (!response.ok) throw new Error();
                 rawData = await response.json();
             } catch (err) {
-                // Fallback jika file tidak ada
                 rawData = [
                     { "cat": "dalam-negeri", "jenjang": "Master", "industri": "Digitalisasi", "univ": "IPB", "prodi": "Ilmu Komputer", "negara": "Indonesia", "bidang": "strategis-stem" }
                 ];
@@ -158,11 +157,10 @@
             }
         }
 
-        // Debouncing: Menunggu pengguna selesai mengetik sebelum memproses
         function debouncedRender() {
             clearTimeout(debounceTimer);
             debounceTimer = setTimeout(() => {
-                currentPage = 1; // Reset ke halaman 1 setiap kali filter berubah
+                currentPage = 1; 
                 renderTable();
             }, 300); 
         }
@@ -194,23 +192,20 @@
             const negaraSearch = document.getElementById('searchNegara').value.toLowerCase();
             const selectedBidang = Array.from(document.querySelectorAll('.checkbox-custom:checked')).map(cb => cb.value);
 
-            // 1. Filtering (Proses ini cepat di JS meski data 10rb+)
             filteredData = rawData.filter(item => {
                 const matchesCat = item.cat === filterCategory;
                 const matchesBidang = selectedBidang.length === 0 || selectedBidang.includes(item.bidang);
-                const matchesUniv = item.univ.toLowerCase().includes(univSearch);
-                const matchesProdi = item.prodi.toLowerCase().includes(prodiSearch);
-                const matchesNegara = item.negara.toLowerCase().includes(negaraSearch);
+                const matchesUniv = (item.univ || "").toLowerCase().includes(univSearch);
+                const matchesProdi = (item.prodi || "").toLowerCase().includes(prodiSearch);
+                const matchesNegara = (item.negara || "").toLowerCase().includes(negaraSearch);
                 return matchesCat && matchesBidang && matchesUniv && matchesProdi && matchesNegara;
             });
 
-            // 2. Pagination Logic
             const totalPages = Math.ceil(filteredData.length / rowsPerPage);
             const startIdx = (currentPage - 1) * rowsPerPage;
             const endIdx = startIdx + rowsPerPage;
             const pageData = filteredData.slice(startIdx, endIdx);
 
-            // 3. Update UI
             document.getElementById('totalCount').innerText = filteredData.length;
             document.getElementById('showingCount').innerText = pageData.length;
             tbody.innerHTML = '';
@@ -220,21 +215,33 @@
             } else {
                 document.getElementById('emptyResult').classList.add('hidden');
                 
-                // Bangun string HTML sekaligus (lebih cepat daripada appendChild berulang)
                 let rowsHtml = '';
                 pageData.forEach((item, index) => {
                     rowsHtml += `
-                        <tr class="hover:bg-slate-50 transition-colors">
+                        <tr class="hover:bg-slate-50 transition-colors group">
                             <td class="px-6 py-4 text-sm text-slate-400">${startIdx + index + 1}</td>
                             <td class="px-6 py-4">
                                 <div class="flex flex-col gap-1">
-                                    <span class="text-xs font-bold text-blue-600 uppercase">${item.industri}</span>
-                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-600 w-fit">${formatBidang(item.bidang)}</span>
+                                    <span class="text-xs font-bold text-blue-600 uppercase tracking-tight">${item.industri}</span>
+                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-600 w-fit border border-slate-200">
+                                        ${formatBidang(item.bidang)}
+                                    </span>
                                 </div>
                             </td>
-                            <td class="px-6 py-4 font-bold text-slate-800 text-sm">${item.univ}</td>
-                            <td class="px-6 py-4 text-sm text-slate-600 italic">${item.prodi}</td>
-                            <td class="px-6 py-4 text-sm text-slate-600">${item.negara}</td>
+                            <td class="px-6 py-4">
+                                <div class="font-bold text-slate-800 text-sm">${item.univ}</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="flex flex-col gap-1">
+                                    <span class="text-sm text-slate-600 italic group-hover:text-blue-600 transition-colors">
+                                        ${item.prodi}
+                                    </span>
+                                    <span class="inline-flex items-center text-[10px] font-semibold px-2 py-0.5 rounded bg-blue-50 text-blue-700 w-fit border border-blue-100">
+                                        ${item.jenjang || 'Master'}
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-sm text-slate-600 font-medium">${item.negara}</td>
                         </tr>`;
                 });
                 tbody.innerHTML = rowsHtml;
@@ -261,10 +268,8 @@
                 return btn;
             };
 
-            // Tombol Previous
             if (currentPage > 1) container.appendChild(createBtn('←', currentPage - 1));
 
-            // Logika Sederhana untuk Halaman (Membatasi jumlah tombol yang tampil)
             let start = Math.max(1, currentPage - 1);
             let end = Math.min(totalPages, start + 2);
             if (end - start < 2) start = Math.max(1, end - 2);
@@ -273,7 +278,6 @@
                 container.appendChild(createBtn(i, i, i === currentPage));
             }
 
-            // Tombol Next
             if (currentPage < totalPages) container.appendChild(createBtn('→', currentPage + 1));
         }
 
