@@ -13,6 +13,10 @@
             color: white; 
             box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
         }
+        .checkbox-custom:checked {
+            background-color: #2563eb;
+            border-color: #2563eb;
+        }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen">
@@ -21,30 +25,54 @@
         <!-- Header Section -->
         <div class="mb-12 text-center">
             <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight">Eksplorasi Program Studi</h1>
-            <p class="text-slate-600 mt-4 text-lg">Cari dan filter program magister berdasarkan industri strategis dan lokasi.</p>
+            <p class="text-slate-600 mt-4 text-lg">Cari dan filter program magister berdasarkan industri strategis, lokasi, dan bidang beasiswa.</p>
         </div>
 
         <!-- Controls Card -->
         <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 mb-8">
-            <div class="flex flex-col lg:flex-row gap-8 items-end">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 
                 <!-- Category Selector -->
-                <div class="w-full lg:w-auto">
-                    <label class="block text-sm font-semibold text-slate-700 mb-3 text-center lg:text-left">Kategori Program</label>
-                    <div class="flex flex-wrap justify-center lg:justify-start gap-2 p-1 bg-slate-100 rounded-xl" id="categoryTabs">
+                <div class="lg:col-span-12">
+                    <label class="block text-sm font-semibold text-slate-700 mb-3">Kategori Program</label>
+                    <div class="flex flex-wrap gap-2 p-1 bg-slate-100 rounded-xl w-fit" id="categoryTabs">
                         <button onclick="changeCategory('semua')" data-cat="semua" class="cat-btn px-5 py-2 rounded-lg text-sm font-medium transition-all tab-active">Semua</button>
+                        <button onclick="changeCategory('unggulan')" data-cat="unggulan" class="cat-btn px-5 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-white transition-all">Unggulan</button>
                         <button onclick="changeCategory('luar-negeri')" data-cat="luar-negeri" class="cat-btn px-5 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-white transition-all">Luar Negeri</button>
                         <button onclick="changeCategory('dalam-negeri')" data-cat="dalam-negeri" class="cat-btn px-5 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-white transition-all">Dalam Negeri</button>
-                        <button onclick="changeCategory('unggulan')" data-cat="unggulan" class="cat-btn px-5 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-white transition-all">Unggulan</button>
+                        <button onclick="changeCategory('afirmasi')" data-cat="afirmasi" class="cat-btn px-5 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-white transition-all">Afirmasi</button>
+                    </div>
+                </div>
+
+                <!-- Bidang Filter (Checkboxes) -->
+                <div class="lg:col-span-12">
+                    <label class="block text-sm font-semibold text-slate-700 mb-3">Filter Bidang Beasiswa</label>
+                    <div class="flex flex-wrap gap-4">
+                        <label class="inline-flex items-center cursor-pointer group">
+                            <input type="checkbox" value="share" onchange="renderTable()" class="checkbox-custom w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500">
+                            <span class="ml-2 text-sm text-slate-600 group-hover:text-blue-600 transition-colors">Beasiswa SHARE</span>
+                        </label>
+                        <label class="inline-flex items-center cursor-pointer group">
+                            <input type="checkbox" value="strategis-stem" onchange="renderTable()" class="checkbox-custom w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500">
+                            <span class="ml-2 text-sm text-slate-600 group-hover:text-blue-600 transition-colors">Strategis STEM</span>
+                        </label>
+                        <label class="inline-flex items-center cursor-pointer group">
+                            <input type="checkbox" value="strategis-pendukung-stem" onchange="renderTable()" class="checkbox-custom w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500">
+                            <span class="ml-2 text-sm text-slate-600 group-hover:text-blue-600 transition-colors">Strategis Pendukung STEM</span>
+                        </label>
+                        <label class="inline-flex items-center cursor-pointer group">
+                            <input type="checkbox" value="strategis-kewirausahaan" onchange="renderTable()" class="checkbox-custom w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500">
+                            <span class="ml-2 text-sm text-slate-600 group-hover:text-blue-600 transition-colors">Kewirausahaan</span>
+                        </label>
                     </div>
                 </div>
 
                 <!-- Search Bar -->
-                <div class="flex-1 w-full">
+                <div class="lg:col-span-12">
                     <label class="block text-sm font-semibold text-slate-700 mb-3">Cari Spesifik</label>
                     <div class="relative">
                         <input type="text" id="searchBox" onkeyup="renderTable()" 
-                               placeholder="Cari universitas, program studi, atau negara..." 
+                               placeholder="Cari universitas, program studi, industri, atau negara..." 
                                class="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all">
                         <div class="absolute left-4 top-3.5 text-slate-400">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -76,8 +104,7 @@
                         <thead>
                             <tr class="bg-slate-50 border-b border-slate-200">
                                 <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">No</th>
-                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Jenjang</th>
-                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Industri Strategis</th>
+                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Industri & Bidang</th>
                                 <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Perguruan Tinggi</th>
                                 <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Program Studi</th>
                                 <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Negara</th>
@@ -110,25 +137,16 @@
     </div>
 
     <script>
-        // Data cadangan jika fetch gagal
+        // Data cadangan menggunakan format baru
         const fallbackData = [
-            { "cat": "luar-negeri", "jenjang": "Magister", "industri": "Digitalisasi", "univ": "Aalborg University", "prodi": "Computer Engineering", "negara": "Denmark" },
-            { "cat": "luar-negeri", "jenjang": "Magister", "industri": "Digitalisasi", "univ": "Aalborg University", "prodi": "Computer Science (IT)", "negara": "Denmark" },
-            { "cat": "luar-negeri", "jenjang": "Magister", "industri": "Digitalisasi", "univ": "Aalborg University", "prodi": "Cyber Security", "negara": "Denmark" },
-            { "cat": "dalam-negeri", "jenjang": "Master", "industri": "Digitalisasi", "univ": "Institut Pertanian Bogor", "prodi": "Ilmu Komputer", "negara": "Indonesia" },
-            { "cat": "dalam-negeri", "jenjang": "Master", "industri": "Digitalisasi", "univ": "Institut Pertanian Bogor", "prodi": "Matematika Terapan", "negara": "Indonesia" },
-            { "cat": "dalam-negeri", "jenjang": "Master", "industri": "Digitalisasi", "univ": "Institut Pertanian Bogor", "prodi": "Statistika Dan Sains Data", "negara": "Indonesia" },
-            { "cat": "dalam-negeri", "jenjang": "Master", "industri": "Digitalisasi", "univ": "Institut Pertanian Bogor", "prodi": "Statistika Terapan", "negara": "Indonesia" },
-            { "cat": "dalam-negeri", "jenjang": "Master", "industri": "Digitalisasi", "univ": "Institut Teknologi Bandung", "prodi": "Aktuaria", "negara": "Indonesia" },
-            { "cat": "dalam-negeri", "jenjang": "Master", "industri": "Digitalisasi", "univ": "Institut Teknologi Bandung", "prodi": "Informatika", "negara": "Indonesia" },
-            { "cat": "dalam-negeri", "jenjang": "Master", "industri": "Digitalisasi", "univ": "Institut Teknologi Bandung", "prodi": "Instrumentasi Dan Kontrol", "negara": "Indonesia" },
-            { "cat": "unggulan", "jenjang": "Magister", "industri": "Digitalisasi", "univ": "California Institute of Technology", "prodi": "Applied and Computational Mathematics, M.S", "negara": "Amerika Serikat" },
-            { "cat": "unggulan", "jenjang": "Magister", "industri": "Digitalisasi", "univ": "California Institute of Technology", "prodi": "Computer Science, M.S", "negara": "Amerika Serikat" },
-            { "cat": "unggulan", "jenjang": "Magister", "industri": "Digitalisasi", "univ": "California Institute of Technology", "prodi": "Computing and Mathematical Sciences, M.S", "negara": "Amerika Serikat" }
+            { "cat": "dalam-negeri", "jenjang": "Master", "industri": "Digitalisasi", "univ": "Institut Pertanian Bogor", "prodi": "Ilmu Komputer", "negara": "Indonesia", "bidang": "strategis-stem" },
+            { "cat": "luar-negeri", "jenjang": "Magister", "industri": "Digitalisasi", "univ": "Aalborg University", "prodi": "Cyber Security", "negara": "Denmark", "bidang": "share" },
+            { "cat": "unggulan", "jenjang": "Magister", "industri": "Digitalisasi", "univ": "Caltech", "prodi": "Computer Science, M.S", "negara": "Amerika Serikat", "bidang": "strategis-stem" },
+            { "cat": "afirmasi", "jenjang": "Magister", "industri": "Pendidikan", "univ": "Universitas Negeri Malang", "prodi": "Pendidikan Dasar", "negara": "Indonesia", "bidang": "strategis-pendukung-stem" }
         ];
 
         let rawData = [];
-        let filterActive = 'semua';
+        let filterCategory = 'semua';
 
         async function fetchData() {
             const loading = document.getElementById('loadingState');
@@ -136,24 +154,15 @@
             const error = document.getElementById('errorState');
             const sourceInfo = document.getElementById('dataSourceInfo');
 
-            // Reset UI states
-            loading.classList.remove('hidden');
-            content.classList.add('hidden');
-            error.classList.add('hidden');
-
             try {
-                // Mencoba fetch file eksternal (bekerja di GitHub Pages)
                 const response = await fetch('./data.json');
                 if (!response.ok) throw new Error('Data file not found');
-                
                 rawData = await response.json();
                 sourceInfo.innerText = "Data dimuat dari file JSON";
-                console.log("Data loaded from JSON");
             } catch (err) {
-                console.warn("Fetch failed, using fallback data:", err);
+                console.warn("Fetch failed, using fallback:", err);
                 rawData = fallbackData;
                 sourceInfo.innerText = "Data dimuat dari memori lokal (cadangan)";
-                // Jangan tampilkan error merah besar, cukup gunakan data fallback
             } finally {
                 loading.classList.add('hidden');
                 content.classList.remove('hidden');
@@ -162,7 +171,7 @@
         }
 
         function changeCategory(cat) {
-            filterActive = cat;
+            filterCategory = cat;
             document.querySelectorAll('.cat-btn').forEach(btn => {
                 if (btn.getAttribute('data-cat') === cat) {
                     btn.classList.add('tab-active');
@@ -175,23 +184,38 @@
             renderTable();
         }
 
+        // Helper untuk format nama bidang yang lebih rapi
+        function formatBidang(bidang) {
+            const mapping = {
+                'share': 'SHARE',
+                'strategis-stem': 'Strategis STEM',
+                'strategis-pendukung-stem': 'Strategis Pendukung STEM',
+                'strategis-kewirausahaan': 'Kewirausahaan'
+            };
+            return mapping[bidang] || bidang;
+        }
+
         function renderTable() {
             const tbody = document.getElementById('tableBody');
             const search = document.getElementById('searchBox').value.toLowerCase();
             const empty = document.getElementById('emptyResult');
             const badge = document.getElementById('countBadge');
             
+            // Ambil bidang yang dicentang
+            const selectedBidang = Array.from(document.querySelectorAll('.checkbox-custom:checked')).map(cb => cb.value);
+            
             tbody.innerHTML = '';
             
             const filtered = rawData.filter(item => {
-                const matchesCat = filterActive === 'semua' || item.cat === filterActive;
+                const matchesCat = filterCategory === 'semua' || item.cat === filterCategory;
+                const matchesBidang = selectedBidang.length === 0 || selectedBidang.includes(item.bidang);
                 const matchesSearch = 
                     item.univ.toLowerCase().includes(search) ||
                     item.prodi.toLowerCase().includes(search) ||
                     item.industri.toLowerCase().includes(search) ||
                     item.negara.toLowerCase().includes(search);
                 
-                return matchesCat && matchesSearch;
+                return matchesCat && matchesBidang && matchesSearch;
             });
 
             badge.innerText = filtered.length;
@@ -204,13 +228,18 @@
                     const row = `
                         <tr class="hover:bg-slate-50 transition-colors group">
                             <td class="px-6 py-4 text-sm font-medium text-slate-400">${index + 1}</td>
-                            <td class="px-6 py-4 text-sm text-slate-600">${item.jenjang}</td>
                             <td class="px-6 py-4">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-700/10">
-                                    ${item.industri}
-                                </span>
+                                <div class="flex flex-col gap-1">
+                                    <span class="text-xs font-bold text-blue-600 uppercase tracking-tight">${item.industri}</span>
+                                    <span class="inline-flex items-center text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-600 w-fit border border-slate-200">
+                                        ${formatBidang(item.bidang)}
+                                    </span>
+                                </div>
                             </td>
-                            <td class="px-6 py-4 text-sm font-bold text-slate-800">${item.univ}</td>
+                            <td class="px-6 py-4">
+                                <div class="text-sm font-bold text-slate-800">${item.univ}</div>
+                                <div class="text-[11px] text-slate-400">${item.jenjang}</div>
+                            </td>
                             <td class="px-6 py-4 text-sm text-slate-600 italic group-hover:text-blue-600 transition-colors">${item.prodi}</td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center text-sm text-slate-600 font-medium">
