@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excel to JSON Converter - Updated</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Library untuk membaca Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body class="bg-slate-50 min-h-screen py-12 px-4">
+
+    <div class="max-w-3xl mx-auto">
+        <div class="bg-white rounded-2xl shadow-xl p-8 border border-slate-200">
+            <div class="text-center mb-8">
+                <h1 class="text-2xl font-bold text-slate-800">Excel to JSON Maker</h1>
+                <p class="text-slate-500 mt-2">Upload file Excel Anda untuk menghasilkan data.json dengan kolom Bidang</p>
+            </div>
+
+            <!-- Petunjuk Format Terbaru -->
+            <div class="bg-blue-50 p-4 rounded-xl mb-8 border border-blue-100">
+                <h2 class="text-sm font-bold text-blue-800 uppercase mb-2">Format Header Excel Terbaru:</h2>
+                <div class="overflow-x-auto">
+                    <code class="text-xs text-blue-600 block bg-white p-2 rounded border border-blue-200 whitespace-nowrap">
+                        cat | jenjang | industri | univ | prodi | negara | bidang
+                    </code>
+                </div>
+                <p class="text-xs text-blue-500 mt-2">* Pastikan semua header di baris pertama Excel tertulis persis seperti di atas.</p>
+            </div>
+
+            <!-- Upload Area -->
+            <div class="flex flex-col items-center justify-center border-2 border-dashed border-slate-300 rounded-2xl p-10 hover:border-blue-500 transition-colors bg-slate-50 cursor-pointer" id="dropZone" onclick="document.getElementById('fileInput').click()">
+                <input type="file" id="fileInput" accept=".xlsx, .xls, .csv" class="hidden">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-slate-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition-all">
+                    Pilih File Excel
+                </span>
+                <p class="text-slate-400 text-sm mt-2">atau seret file ke area ini</p>
+            </div>
+
+            <!-- Result Area -->
+            <div id="resultArea" class="hidden mt-8">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-slate-800">Hasil Preview JSON:</h3>
+                    <div class="flex gap-2">
+                         <button onclick="copyToClipboard()" class="text-sm bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-lg font-medium transition-all">
+                            Salin JSON
+                        </button>
+                        <button onclick="downloadJSON()" class="text-sm bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-all">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            Download data.json
+                        </button>
+                    </div>
+                </div>
+                <textarea id="jsonOutput" class="w-full h-64 p-4 bg-slate-900 text-green-400 font-mono text-xs rounded-xl border border-slate-800 outline-none" readonly></textarea>
+            </div>
+        </div>
+        
+        <p class="text-center text-slate-400 text-xs mt-6">Aplikasi berjalan sepenuhnya di browser. Data Anda tidak dikirim ke server manapun.</p>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const jsonOutput = document.getElementById('jsonOutput');
+        const resultArea = document.getElementById('resultArea');
+        let generatedJSON = "";
+
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    
+                    // Mengonversi ke JSON (dengan header otomatis)
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet);
+                    
+                    if (jsonData.length === 0) {
+                        alert("File Excel kosong atau format tidak sesuai.");
+                        return;
+                    }
+
+                    generatedJSON = JSON.stringify(jsonData, null, 2);
+                    jsonOutput.value = generatedJSON;
+                    resultArea.classList.remove('hidden');
+                    
+                    // Scroll otomatis ke hasil
+                    resultArea.scrollIntoView({ behavior: 'smooth' });
+                } catch (error) {
+                    console.error(error);
+                    alert("Terjadi kesalahan saat membaca file. Pastikan file Excel valid.");
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        });
+
+        function downloadJSON() {
+            if (!generatedJSON) return;
+            const blob = new Blob([generatedJSON], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'data.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function copyToClipboard() {
+            const textarea = document.getElementById('jsonOutput');
+            textarea.select();
+            document.execCommand('copy');
+            alert("JSON berhasil disalin ke clipboard!");
+        }
+
+        // Drag and drop logic
+        const dropZone = document.getElementById('dropZone');
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('border-blue-500', 'bg-blue-50'); });
+        dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('border-blue-500', 'bg-blue-50'); });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('border-blue-500', 'bg-blue-50');
+            fileInput.files = e.dataTransfer.files;
+            fileInput.dispatchEvent(new Event('change'));
+        });
+    </script>
+</body>
+</html>
